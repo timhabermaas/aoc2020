@@ -1,8 +1,8 @@
 use std::fs::read_to_string;
 
-fn bits_to_byte(bits: &[bool]) -> u8 {
+fn bits_to_byte(bits: &[bool]) -> i32 {
     let foo = bits.iter().rev().fold((0, 0), |(acc, ex), x| {
-        (acc + (*x as u8) * (2 as u8).pow(ex), ex + 1)
+        (acc + (*x as i32) * (2 as i32).pow(ex), ex + 1)
     });
     foo.0
 }
@@ -26,7 +26,7 @@ fn main() {
             _ => false,
         });
         let column = bits_to_byte(second_part.collect::<Vec<_>>().as_slice());
-        let seat_id = row as u32 * 8 + column as u32;
+        let seat_id = row * 8 + column;
         seat_id
     });
 
@@ -38,13 +38,16 @@ fn main() {
     println!("{:?}", seats.iter().last());
 
     // Part 2
-    let missing_seat_id = seats.iter().zip(seats.iter().skip(1)).find_map(|(x, y)| {
-        if *y as i32 - *x as i32 > 1 {
-            Some(x + 1)
-        } else {
-            None
-        }
-    });
+    let missing_seat_id =
+        seats.iter().zip(seats.iter().skip(1)).find_map(
+            |(x, y)| {
+                if y - x > 1 {
+                    Some(x + 1)
+                } else {
+                    None
+                }
+            },
+        );
     // Result: 625
     println!("{:?}", missing_seat_id);
 }
