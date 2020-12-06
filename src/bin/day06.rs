@@ -1,11 +1,9 @@
-use regex::Regex;
 use std::collections::HashSet;
 use std::fs::read_to_string;
 
 fn main() {
     let content = read_to_string("./inputs/day06.txt").expect("file not found");
-    let reg = Regex::new(r"\n\n").unwrap();
-    let groups: Vec<&str> = reg.split(&content).collect();
+    let groups: Vec<&str> = content.split("\n\n").collect();
 
     // Task 1:
     let mut count = 0;
@@ -26,7 +24,7 @@ fn main() {
 
         let mut group_questions = question_sets[0].clone();
         for questions in question_sets {
-            group_questions = group_questions.intersection(&questions).cloned().collect();
+            group_questions = &group_questions & &questions;
         }
 
         count += group_questions.len();
