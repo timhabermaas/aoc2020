@@ -22,13 +22,12 @@ fn parse_line(line: &str) -> (&str, Vec<(usize, &str)>) {
 // First find all bags which directly contain a shiny gold bag. Then find all bags which contain
 // the bags currently in the solution set. Iterate until the set doesn't get larger anymore.
 // Fixpoint iteration.
-fn find_contains(containers: &mut HashSet<String>, map: &HashMap<&str, Vec<&str>>) -> bool {
+fn find_contains<'a>(containers: &mut HashSet<&'a str>, map: &HashMap<&str, Vec<&'a str>>) -> bool {
     let mut container_grew = false;
     for container in containers.clone().iter() {
-        if let Some(cs) = map.get(container.as_str()) {
+        if let Some(cs) = map.get(container) {
             for c in cs {
-                // TODO: Avoid allocation.
-                container_grew = container_grew || containers.insert(c.to_string());
+                container_grew = container_grew || containers.insert(c);
             }
         }
     }
@@ -49,7 +48,7 @@ fn main() {
     }
 
     let mut containers = HashSet::new();
-    containers.insert("shiny gold".to_string());
+    containers.insert("shiny gold");
 
     while find_contains(&mut containers, &some_map) == true {}
 
