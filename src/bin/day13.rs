@@ -66,13 +66,7 @@ fn part_2(time_table: &str) -> i64 {
         })
         .sum();
 
-    let solution = solution % remainder_product;
-
-    if solution < 0 {
-        return remainder_product + solution;
-    } else {
-        return solution;
-    }
+    return solution.rem_euclid(remainder_product);
 }
 
 #[cfg(test)]
