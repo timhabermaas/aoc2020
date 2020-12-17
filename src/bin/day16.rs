@@ -1,14 +1,18 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fs::read_to_string;
+use std::ops::RangeInclusive;
 
-fn is_in_range(number: u32, ((a1, b1), (a2, b2)): &((u32, u32), (u32, u32))) -> bool {
-    number >= *a1 && number <= *b1 || number >= *a2 && number <= *b2
+fn is_in_range(
+    number: u32,
+    (range_1, range_2): &(RangeInclusive<u32>, RangeInclusive<u32>),
+) -> bool {
+    range_1.contains(&number) || range_2.contains(&number)
 }
 
-fn parse_range(range: &str) -> (u32, u32) {
+fn parse_range(range: &str) -> RangeInclusive<u32> {
     let mut numbers = range.split('-');
-    (
+    RangeInclusive::new(
         numbers.next().unwrap().parse().unwrap(),
         numbers.next().unwrap().parse().unwrap(),
     )
@@ -32,7 +36,7 @@ fn limit_possible_fields(number: u32, conditions: &HashSet<Field>) -> HashSet<Fi
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct Field {
     name: String,
-    conditions: ((u32, u32), (u32, u32)),
+    conditions: (RangeInclusive<u32>, RangeInclusive<u32>),
 }
 
 fn main() {
