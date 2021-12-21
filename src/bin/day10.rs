@@ -1,13 +1,14 @@
+use std::collections::HashMap;
 use std::fs::read_to_string;
+
+fn parse(input: &str) -> Vec<u64> {
+    input.lines().map(str::parse).map(Result::unwrap).collect()
+}
 
 fn main() {
     let content = read_to_string("./inputs/day10.txt").expect("file not found");
 
-    let mut adapters: Vec<u64> = content
-        .lines()
-        .map(str::parse)
-        .map(Result::unwrap)
-        .collect();
+    let mut adapters = parse(&content);
 
     adapters.sort();
     adapters.insert(0, 0);
@@ -32,18 +33,31 @@ fn main() {
     let (ones, _, threes) = differences;
 
     // Result: 2592
-    println!("{}", ones * threes);
+    println!("Part 1: {}", ones * threes);
 
-    // Second task: It kinda looks like a graph problem. With node 0 we have N edges to get to 1,
-    // 2 and 3. To count the number of arrangements we have to count the number of paths through
-    // that graph.
-    // BFS and fold over outgoing edges by multiplying them?
-    //
-    // We might be able to define the graph in reverse order (starting with goal) and recursively
-    // going back.
-    // Topological sort? What's the data structure used to express the result of a topological
-    // sort?
-    // Our input list is naturally topologically sorted as long as the values are sorted.
-    //
-    // Combine topological sort + recursion? If we have a list of nodes we should be able to...???
+    println!("Part 2: {}", part_2(&adapters));
+}
+
+fn part_2(adapters: &[u64]) -> usize {
+    // count of possibilities to get from index to end
+    let mut dp: HashMap<usize, usize> = HashMap::new();
+    dp.insert(adapters.len() - 1, 1);
+
+    for i in (0..adapters.len() - 1).rev() {
+        let current_j = adapters[i];
+        let mut possibilities = 0;
+
+        for step in 1..=3 {
+            if i + step > adapters.len() - 1 {
+                continue;
+            }
+
+            if adapters[i + step] - current_j <= 3 {
+                possibilities += dp[&(i + step)]
+            }
+        }
+        dp.insert(i, possibilities);
+    }
+
+    dp[&0]
 }
