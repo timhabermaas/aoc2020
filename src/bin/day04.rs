@@ -11,7 +11,7 @@ enum Distance {
 use Distance::*;
 
 fn parse_height(height: &str) -> Option<Distance> {
-    let reg = Regex::new(r"(\d+)(cm|in)").unwrap();
+    let reg = Regex::new(r"^(\d+)(cm|in)$").unwrap();
     match reg.captures(height) {
         Some(cap) => match cap.get(2).unwrap().as_str() {
             "cm" => Some(Cm(cap.get(1).unwrap().as_str().parse::<i32>().unwrap())),
@@ -22,7 +22,7 @@ fn parse_height(height: &str) -> Option<Distance> {
 }
 
 fn parse_haircolor(color: &str) -> Option<()> {
-    let reg = Regex::new(r"#[0-9a-f]{6}").unwrap();
+    let reg = Regex::new(r"^#[0-9a-f]{6}$").unwrap();
     if reg.is_match(color) {
         Some(())
     } else {
@@ -31,7 +31,7 @@ fn parse_haircolor(color: &str) -> Option<()> {
 }
 
 fn parse_eyecolor(color: &str) -> Option<()> {
-    let reg = Regex::new(r"(amb|blu|brn|gry|grn|hzl|oth)").unwrap();
+    let reg = Regex::new(r"^(amb|blu|brn|gry|grn|hzl|oth)$").unwrap();
     if reg.is_match(color) {
         Some(())
     } else {
@@ -40,7 +40,7 @@ fn parse_eyecolor(color: &str) -> Option<()> {
 }
 
 fn parse_pid(pid: &str) -> Option<()> {
-    let reg = Regex::new(r"\d{9}").unwrap();
+    let reg = Regex::new(r"^\d{9}$").unwrap();
     if reg.is_match(pid) {
         Some(())
     } else {
@@ -48,6 +48,7 @@ fn parse_pid(pid: &str) -> Option<()> {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -59,6 +60,7 @@ mod tests {
         assert_eq!(parse_height("23n"), None);
     }
 
+    #[test]
     fn test_parse_haircolor() {
         assert_eq!(parse_haircolor("#123abc"), Some(()));
         assert_eq!(parse_haircolor("#123abz"), None);
@@ -117,6 +119,7 @@ fn main() {
     let passport_keys = content.split("\n\n").map(|passport_data| {
         newline_or_space
             .split(passport_data)
+            .filter(|k| !k.is_empty())
             .map(|kv| {
                 let mut it = kv.split(':');
                 (it.next().unwrap(), it.next().unwrap())
